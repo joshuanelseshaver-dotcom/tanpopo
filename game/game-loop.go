@@ -1,11 +1,12 @@
 package game
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
 	map_director "raylib/playground/directors/map-director"
 	audio_engine "raylib/playground/engines/audio-engine"
 	physics_engine "raylib/playground/engines/physics-engine"
 	"raylib/playground/model/draw2d"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func Update() {

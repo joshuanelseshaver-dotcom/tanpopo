@@ -1,10 +1,11 @@
 package spawn
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
 	util "raylib/playground/game/utils"
 	"raylib/playground/model"
 	"raylib/playground/model/draw2d"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func NewEnemy() *model.Enemy {

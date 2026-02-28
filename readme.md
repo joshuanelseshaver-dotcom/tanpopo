@@ -2,7 +2,7 @@
 
 A 2D top-down game engine prototype written in Go, targeting a RuneScape 2 / RotMG-style MMO-lite.
 
-![Gameplay screenshot](docs/screenshot.png)
+![Gameplay screenshot](docs/game-screenshot.png)
 
 Built on [raylib-go](https://github.com/gen2brain/raylib-go) for rendering/audio and [resolv](https://github.com/solarlune/resolv) for collision.
 
