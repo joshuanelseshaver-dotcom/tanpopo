@@ -2,13 +2,15 @@ package draw_world_engine
 
 import (
 	"fmt"
-	"raylib/playground/director-models/draw-model"
-	"raylib/playground/director-models/map-model"
-	"raylib/playground/director-models/point-model"
+	"math"
 	"raylib/playground/engines/physics-engine"
 	util "raylib/playground/game/utils"
 	"raylib/playground/model"
+	"raylib/playground/model/draw2d"
 	"raylib/playground/model/draw2d/texture-maps"
+	"raylib/playground/shared/draw"
+	"raylib/playground/shared/mapdata"
+	"raylib/playground/shared/point"
 	"strings"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -17,12 +19,12 @@ import (
 var (
 	player            *model.Player
 	enemies           *[]*model.Enemy
-	currentMap        *map_model.MapModel
+	currentMap        *mapdata.MapModel
 	collisionMapDebug []rl.Rectangle
 	frameCount        int32
 )
 
-func SetCurrentMap(_currentMap *map_model.MapModel) {
+func SetCurrentMap(_currentMap *mapdata.MapModel) {
 	currentMap = _currentMap
 }
 
@@ -38,7 +40,7 @@ func SetEnemies(_enemies *[]*model.Enemy) {
 	enemies = _enemies
 }
 
-func DrawMapBackground() []draw_model.DrawParams {
+func DrawMapBackground() []draw.DrawParams {
 
 	tileSrc := rl.Rectangle{
 		Height: currentMap.SrcTileDimension.Height,
@@ -49,7 +51,7 @@ func DrawMapBackground() []draw_model.DrawParams {
 		Width:  currentMap.DestTileDimension.Width,
 	}
 
-	var foreGroundDrawParams []draw_model.DrawParams
+	var foreGroundDrawParams []draw.DrawParams
 	for i, tileInt := range currentMap.TileMap {
 		if tileInt == 0 {
 			continue
@@ -71,7 +73,7 @@ func DrawMapBackground() []draw_model.DrawParams {
 			if strings.ToLower(currentMap.SrcMap[i]) == "w" || player != nil && tileDest.Y > player.Sprite.Dest.Y {
 				foreGroundDrawParams = append(
 					foreGroundDrawParams,
-					draw_model.DrawParams{
+					draw.DrawParams{
 						Texture:  currentMap.Texture,
 						SrcRec:   tileSrc,
 						DestRec:  tileDest,
@@ -90,32 +92,125 @@ func DrawMapBackground() []draw_model.DrawParams {
 	return foreGroundDrawParams
 }
 
+func drawPlayer(p *model.Player, fc int32) {
+	if fc%8 == 1 {
+		p.Sprite.Frame++
+	}
+	if p.Sprite.Frame > 3 {
+		p.Sprite.Frame = 0
+	}
+	var weaponOffset float32 = 0
+	if p.IsMoving() {
+		p.Sprite.Src.X = 192                                                                           // pixel where run animation starts
+		p.Sprite.Src.X += float32(p.Sprite.Frame) * float32(math.Abs(float64(p.Sprite.Src.Width))) // rolling the animation
+		weaponOffset = -4
+	} else {
+		if p.SpriteFlipped {
+			util.FlipLeft(&p.Sprite.Src)
+		} else {
+			util.FlipRight(&p.Sprite.Src)
+		}
+		p.Sprite.Src.X = 128                                                                           // pixel where rest idle starts
+		p.Sprite.Src.X += float32(p.Sprite.Frame) * float32(math.Abs(float64(p.Sprite.Src.Width))) // rolling the animation
+	}
+	p.Weapon.SpriteFlipped = p.SpriteFlipped
+	rl.DrawTexturePro(draw2d.Texture, p.Sprite.Src, p.Sprite.Dest, rl.NewVector2(p.Sprite.Dest.Width, p.Sprite.Dest.Height), 0, rl.White)
+	updateFrame := fc%8 == 0
+	drawWeapon(p.Weapon, p.Sprite.Frame, updateFrame, weaponOffset)
+}
+
+func drawWeapon(w *model.Weapon, frame int, nextFrame bool, offset float32) {
+	rotation := w.IdleRotation
+	if w.AttackFrame >= 0 && w.AttackRotator != nil {
+		rotation = w.AttackRotator(*w)
+		w.AttackFrame++
+
+		if w.AttackFrame >= w.AttackSpeed {
+			w.AttackFrame = -1 // setting to -1 to symbolize attack is finished animating
+			w.Move(0, 0)       // recenter weapon after attack animation
+		}
+
+	} else if nextFrame {
+
+		if frame == 0 || frame == 1 {
+			w.Sprite.Dest.Y += 1
+		} else {
+			w.Sprite.Dest.Y -= 1
+		}
+	}
+
+	if !w.SpriteFlipped {
+		util.FlipRight(&w.Sprite.Src)
+	}
+	if w.SpriteFlipped {
+		util.FlipLeft(&w.Sprite.Src)
+		rotation *= -1
+	}
+
+	origin := rl.NewVector2(w.Handle.X, w.Handle.Y)
+	dest := w.Sprite.Dest
+	dest.Y += offset
+
+	rl.DrawTexturePro(w.Sprite.Texture, w.Sprite.Src, dest,
+		origin, rotation, w.TintColor)
+}
+
+func drawEnemy(e *model.Enemy, fc int32) {
+	if fc%8 == 1 && !e.Dead {
+		e.Sprite.Frame++
+	}
+	if e.Sprite.Frame > 3 {
+		e.Sprite.Frame = 0
+	}
+
+	tint := rl.White
+	if e.HurtFrames > 0 {
+		tint = rl.Red
+		e.HurtFrames--
+	}
+	if e.DeathFrames > 0 {
+		if e.Sprite.Rotation < 90 {
+			e.Sprite.Rotation = float32(math.Min(90, float64(e.Sprite.Rotation)+8))
+		}
+		e.DeathFrames--
+	}
+
+	e.Sprite.Src.X = 368                                                                           // pixel where rest idle starts
+	e.Sprite.Src.X += float32(e.Sprite.Frame) * float32(math.Abs(float64(e.Sprite.Src.Width))) // rolling the animation
+
+	rl.DrawTexturePro(draw2d.Texture, e.Sprite.Src, e.Sprite.Dest, rl.NewVector2(e.Sprite.Dest.Width, e.Sprite.Dest.Height), e.Sprite.Rotation, tint)
+
+	if e.Health != e.MaxHealth && !e.Dead {
+		rl.DrawRectangle(int32(e.Obj.X), int32(e.Obj.Y-10), int32(e.Obj.W), 4, rl.Red)
+		rl.DrawRectangle(int32(e.Obj.X), int32(e.Obj.Y-10), int32(int(e.Obj.W)*e.Health/e.MaxHealth), 4, rl.Green)
+	}
+}
+
+func drawProjectile(p *model.Projectile) {
+	w := p.Sprite.Dest.Width
+	h := p.Sprite.Dest.Height
+	dest := rl.NewRectangle(p.Start.X, p.Start.Y, w, h)
+	rl.DrawTexturePro(p.Sprite.Texture, p.Sprite.Src, dest,
+		rl.NewVector2(dest.Width/2, dest.Height), float32(180-p.Trajectory), rl.White)
+}
+
 func DrawScene(debugMode bool) {
 	foreGround := DrawMapBackground()
 
-	/*
-		Thinking to make a method drawEnv
-			players, monsters, and projectiles should all be part of an env array
-			Here I could have an interface for SomeEnvObject.Draw()
-			This draw method in implemetation could handle drawing sub components / nested images
-			for example:
-				The Player.Draw() could make sure that the wielded weapon
-				is drawn as well as the player itself.
-	*/
 	if player != nil {
-		player.Draw(frameCount)
+		drawPlayer(player, frameCount)
 	}
 	if enemies != nil {
 		for _, e := range *enemies {
-			e.Draw(frameCount)
+			drawEnemy(e, frameCount)
 		}
 	}
-	for _, p := range physics_engine.Projectiles {
-		p.Draw()
+	for i := range physics_engine.Projectiles {
+		drawProjectile(&physics_engine.Projectiles[i])
 	}
 	// drawing foreground after player so it appears "in-front"
-	for _, draw := range foreGround {
-		rl.DrawTexturePro(draw.Texture, draw.SrcRec, draw.DestRec, draw.Origin, draw.Rotation, draw.Tint)
+	for _, d := range foreGround {
+		rl.DrawTexturePro(d.Texture, d.SrcRec, d.DestRec, d.Origin, d.Rotation, d.Tint)
 	}
 
 	// draw debug collision objects
@@ -137,7 +232,7 @@ func DrawScene(debugMode bool) {
 			rl.DrawRectangleLines(int32(e.Obj.X), int32(e.Obj.Y), int32(e.Obj.W), int32(e.Obj.H), rl.White)
 		}
 
-		playerCenter := point_model.Point{
+		playerCenter := point.Point{
 			X: float32(player.Obj.X + player.Obj.W/2),
 			Y: float32(player.Obj.Y + player.Obj.H/2),
 		}

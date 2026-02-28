@@ -39,6 +39,11 @@ func ReadPlayerInputs() {
 			Camera.Zoom = float32(math.Max(.75, float64(Camera.Zoom+float32(mouseMove)/15)))
 		}
 	}
+	// Determine facing when idle
+	if !MainPlayer.IsMoving() {
+		MainPlayer.SpriteFlipped = rl.GetMouseX() < int32(rl.GetScreenWidth())/2
+	}
+
 	if rl.IsMouseButtonDown(rl.MouseLeftButton) {
 		MainPlayer.Attacking = true
 	}

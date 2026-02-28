@@ -16,12 +16,3 @@ type Projectile struct {
 
 	// sender     *interface{} at somepoint this would be good to have
 }
-
-func (p *Projectile) Draw() {
-	w := p.Sprite.Dest.Width
-	h := p.Sprite.Dest.Height
-	dest := rl.NewRectangle(p.Start.X, p.Start.Y, w, h)
-	rl.DrawTexturePro(p.Sprite.Texture, p.Sprite.Src, dest,
-		rl.NewVector2(dest.Width/2, dest.Height), float32(180-p.Trajectory), rl.White)
-
-}

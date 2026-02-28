@@ -1,4 +1,4 @@
-package spawn_engine
+package spawn
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"

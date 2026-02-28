@@ -2,11 +2,11 @@ package game
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
-	pointModel "raylib/playground/director-models/point-model"
 	util "raylib/playground/game/utils"
 	"raylib/playground/model"
 	"raylib/playground/model/armory/swords"
 	"raylib/playground/model/draw2d"
+	point "raylib/playground/shared/point"
 )
 
 var MainPlayer model.Player
@@ -25,7 +25,7 @@ func LoadMainPlayer() {
 		Sprite: playerSprite,
 		Obj:    playerObj,
 		Speed:  3,
-		Hand:   pointModel.Point{X: float32(playerObj.W) * .5, Y: float32(playerObj.H) * .94},
+		Hand:   point.Point{X: float32(playerObj.W) * .5, Y: float32(playerObj.H) * .94},
 	}
 
 	MainPlayer.Sprite.Dest.X = util.RectFromObj(MainPlayer.Obj).X

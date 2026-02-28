@@ -1,4 +1,4 @@
-package map_model
+package mapdata
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 

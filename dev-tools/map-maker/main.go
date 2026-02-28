@@ -4,7 +4,7 @@ import (
 	"fmt"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"raylib/playground/dev-tools/map-maker/gui"
-	draw_model "raylib/playground/director-models/draw-model"
+	draw_model "raylib/playground/shared/draw"
 	map_director "raylib/playground/directors/map-director"
 	audio_engine "raylib/playground/engines/audio-engine"
 	draw_world_engine "raylib/playground/engines/draw-world-engine"

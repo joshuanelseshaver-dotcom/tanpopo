@@ -1,4 +1,4 @@
-package point_model
+package point
 
 type Point struct {
 	X float32

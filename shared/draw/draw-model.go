@@ -1,4 +1,4 @@
-package draw_model
+package draw
 
 import (
 	"image/color"

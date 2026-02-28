@@ -1,7 +1,7 @@
 package texturemaps
 
 import (
-	pointmodel "raylib/playground/director-models/point-model"
+	point "raylib/playground/shared/point"
 )
 
 // TODO move this out - not sure where yet
@@ -27,7 +27,7 @@ func (c CollisionOffset) GetTileCollisionOffset(x, y, w, h float32) (float32, fl
 }
 
 var (
-	TileMapIndex = map[string]map[int]pointmodel.Point{
+	TileMapIndex = map[string]map[int]point.Point{
 		"_": EmptyTileMap,
 		"f": FloorTileMap,
 		"w": WallTileMap,
@@ -40,10 +40,10 @@ var (
 		"d": {L: .8, R: .8, T: .3, B: 1},
 		"@": {1, 1, 1, 1},
 	}
-	EmptyTileMap = map[int]pointmodel.Point{
+	EmptyTileMap = map[int]point.Point{
 		0: {X: 0, Y: 0},
 	}
-	FloorTileMap = map[int]pointmodel.Point{
+	FloorTileMap = map[int]point.Point{
 		1: {X: 16, Y: 64}, // plain floor
 		2: {X: 32, Y: 64}, // really cracked floor
 		3: {X: 48, Y: 64}, // kinda cracked floor
@@ -54,7 +54,7 @@ var (
 		8: {X: 32, Y: 96}, // top left whole
 		9: {X: 48, Y: 96}, // ladder
 	}
-	WallTileMap = map[int]pointmodel.Point{
+	WallTileMap = map[int]point.Point{
 		1:  {X: 16, Y: 0},   // top left
 		2:  {X: 32, Y: 0},   // top mid
 		3:  {X: 48, Y: 0},   // top right
@@ -82,7 +82,7 @@ var (
 		25: {X: 80, Y: 160}, // wall_inner_corner_t_top_left 80 160 16 16
 		26: {X: 64, Y: 160}, // wall_inner_corner_t_top_rigth 64 160 16 16
 	}
-	DecorTileMap = map[int]pointmodel.Point{
+	DecorTileMap = map[int]point.Point{
 		1:  {X: 64, Y: 0},   // wall_fountain_top 64 0 16 16
 		2:  {X: 64, Y: 16},  // wall_fountain_mid_red_anim 64 16 16 16 3
 		3:  {X: 64, Y: 32},  // wall_fountain_basin_red_anim 64 32 16 16 3
@@ -99,7 +99,7 @@ var (
 		14: {X: 80, Y: 96},  // column_mid 80 96 16 16
 		15: {X: 80, Y: 112}, // column_base 80 112 16 16
 	}
-	NavigationTileMap = map[int]pointmodel.Point{
+	NavigationTileMap = map[int]point.Point{
 		1: {X: 304, Y: 288}, // chest_empty_open_anim 304 288 16 16 3
 	}
 )

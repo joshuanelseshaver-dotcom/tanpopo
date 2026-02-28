@@ -2,8 +2,8 @@ package physics_engine
 
 import (
 	"fmt"
-	"raylib/playground/director-models/map-model"
 	"raylib/playground/model/draw2d/texture-maps"
+	"raylib/playground/shared/mapdata"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/solarlune/resolv"
@@ -11,7 +11,7 @@ import (
 
 var WorldCollisionSpace *resolv.Space
 
-func SetWorldSpaceCollidables(currentMap *map_model.MapModel) []rl.Rectangle {
+func SetWorldSpaceCollidables(currentMap *mapdata.MapModel) []rl.Rectangle {
 
 	tileDest := rl.Rectangle{
 		Height: currentMap.DestTileDimension.Height,

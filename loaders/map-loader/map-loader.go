@@ -1,11 +1,11 @@
-package map_engine
+package map_loader
 
 import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"raylib/playground/director-models/map-model"
 	"raylib/playground/engines/physics-engine"
+	"raylib/playground/shared/mapdata"
 	"strconv"
 	"strings"
 
@@ -13,7 +13,7 @@ import (
 	"github.com/solarlune/resolv"
 )
 
-func LoadMap(mapFile string, texture rl.Texture2D) *map_model.MapModel {
+func LoadMap(mapFile string, texture rl.Texture2D) *mapdata.MapModel {
 	fmt.Println("Attempting to load map:", mapFile)
 
 	file, err := ioutil.ReadFile(mapFile)
@@ -37,8 +37,8 @@ func LoadMap(mapFile string, texture rl.Texture2D) *map_model.MapModel {
 		os.Exit(1)
 	}
 
-	srcTileDimension := map_model.TileDimension{Width: 16, Height: 16}
-	destTileDimension := map_model.TileDimension{Width: 32, Height: 32}
+	srcTileDimension := mapdata.TileDimension{Width: 16, Height: 16}
+	destTileDimension := mapdata.TileDimension{Width: 32, Height: 32}
 
 	//pixel level collision
 	spaceWidth := mapW * int(2*destTileDimension.Width)
@@ -65,7 +65,7 @@ func LoadMap(mapFile string, texture rl.Texture2D) *map_model.MapModel {
 		}
 	}
 
-	return &map_model.MapModel{
+	return &mapdata.MapModel{
 		Width:             mapW,
 		Height:            mapH,
 		SrcMap:            srcMap,

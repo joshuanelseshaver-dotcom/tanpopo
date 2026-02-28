@@ -25,6 +25,7 @@ func Update() {
 	}
 	if MainPlayer.Attacking {
 		physics_engine.FireProjects(MainPlayer.Attack())
+		audio_engine.PlaySound(audio_engine.SwordSound)
 	}
 
 	physics_engine.CalculatePlayerProjectileOutcome(&Enemies)

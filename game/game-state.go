@@ -6,7 +6,7 @@ import (
 	"raylib/playground/engines/audio-engine"
 	"raylib/playground/engines/draw-world-engine"
 	collision_engine "raylib/playground/engines/physics-engine"
-	spawn_engine "raylib/playground/engines/spawn-engine"
+	spawn "raylib/playground/engines/spawn"
 	"raylib/playground/model"
 	"raylib/playground/model/draw2d"
 )
@@ -40,7 +40,7 @@ func Initialize(debugMode bool) {
 
 	map_director.LoadMap(mapFile, draw2d.Texture)
 
-	enemy := spawn_engine.NewEnemy()
+	enemy := spawn.NewEnemy()
 	Enemies = append(Enemies, enemy)
 
 	collision_engine.WorldCollisionSpace.Add(MainPlayer.Obj, enemy.Obj)

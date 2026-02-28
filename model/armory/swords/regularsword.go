@@ -1,7 +1,7 @@
 package swords
 
 import (
-	pointmodel "raylib/playground/director-models/point-model"
+	point "raylib/playground/shared/point"
 	util "raylib/playground/game/utils"
 	data2 "raylib/playground/model"
 	"raylib/playground/model/draw2d"
@@ -27,7 +27,7 @@ func RegularSword() *data2.Weapon {
 		Sprite: s,
 		Obj:    util.ObjFromRect(s.Dest),
 		// handle is the origin offset for the sprite
-		Handle:       pointmodel.Point{X: s.Dest.Width * .5, Y: s.Dest.Height * .9},
+		Handle:       point.Point{X: s.Dest.Width * .5, Y: s.Dest.Height * .9},
 		AttackSpeed:  8,
 		Cooldown:     24,
 		IdleRotation: -30,

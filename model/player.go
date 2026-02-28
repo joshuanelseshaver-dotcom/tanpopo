@@ -2,10 +2,8 @@ package model
 
 import (
 	"math"
-	pointmodel "raylib/playground/director-models/point-model"
-	audioengine "raylib/playground/engines/audio-engine"
 	util "raylib/playground/game/utils"
-	"raylib/playground/model/draw2d"
+	point "raylib/playground/shared/point"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/solarlune/resolv"
@@ -28,7 +26,7 @@ type Player struct {
 	SpriteFlipped  bool
 	Obj            *resolv.Object
 	Weapon         *Weapon
-	Hand           pointmodel.Point
+	Hand           point.Point
 	Moving         PlayerMovement
 	Speed          float32
 	Attacking      bool
@@ -47,46 +45,14 @@ func (p *Player) Move(dx, dy float64) {
 	p.Weapon.AnchoredMove(ax, ay)
 }
 
-func (p *Player) Draw(frameCount int32) {
-	if frameCount%8 == 1 {
-		p.Sprite.Frame++
-	}
-	if p.Sprite.Frame > 3 {
-		p.Sprite.Frame = 0
-	}
-	var weaponOffset float32 = 0
-	if p.IsMoving() {
-		p.Sprite.Src.X = 192                                                                       // pixel where run animation starts
-		p.Sprite.Src.X += float32(p.Sprite.Frame) * float32(math.Abs(float64(p.Sprite.Src.Width))) // rolling the animation
-		weaponOffset = -4
-	} else {
-		if rl.GetScreenWidth()/2 <= int(rl.GetMouseX()) {
-			util.FlipRight(&p.Sprite.Src)
-			p.SpriteFlipped = false
-		} else {
-			util.FlipLeft(&p.Sprite.Src)
-			p.SpriteFlipped = true
-		}
-		p.Sprite.Src.X = 128                                                                       // pixel where rest idle starts
-		p.Sprite.Src.X += float32(p.Sprite.Frame) * float32(math.Abs(float64(p.Sprite.Src.Width))) // rolling the animation
-	}
-	p.Weapon.SpriteFlipped = p.SpriteFlipped
-	// p.Moving = false
-	rl.DrawTexturePro(draw2d.Texture, p.Sprite.Src, p.Sprite.Dest, rl.NewVector2(p.Sprite.Dest.Width, p.Sprite.Dest.Height), 0, rl.White)
-	updateFrame := frameCount%8 == 0
-	p.Weapon.Draw(p.Sprite.Frame, updateFrame, weaponOffset)
-}
-
 func (p *Player) Attack() []Projectile {
-	audioengine.PlaySound(audioengine.SwordSound)
 	p.Weapon.AttackFrame = 0 // find a better way to trigger animation than this.
 	p.AttackCooldown = p.Weapon.Cooldown
 
-	playerCenter := pointmodel.Point{
+	playerCenter := point.Point{
 		X: float32(p.Obj.X + p.Obj.W/2),
 		Y: float32(p.Obj.Y + p.Obj.H/2),
 	}
-	rl.DrawCircleLines(int32(playerCenter.X), int32(playerCenter.Y), 32, rl.Green)
 	angle := util.GetPlayerToMouseAngleDegrees()
 
 	// TODO use weapon attributes in the future to determine this logic
